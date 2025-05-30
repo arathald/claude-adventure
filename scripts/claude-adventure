@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Claude Adventure Mode Toggle Script
+# Usage: claude-adventure [on|off|true|false|1|0]
+# Without arguments: toggles current state
+
+CLAUDE_DIR="$HOME/.claude"
+CLAUDE_FILE="$CLAUDE_DIR/CLAUDE.md"
+ADVENTURE_MODE_FILE="$CLAUDE_DIR/ADVENTURE_MODE.md"
+START_MARKER="### BEGIN CLAUDE ADVENTURE MODE INSTRUCTIONS"
+END_MARKER="### END CLAUDE ADVENTURE MODE INSTRUCTIONS"
+
+# Ensure .claude directory exists
+mkdir -p "$CLAUDE_DIR"
+
+# Function to check if adventure mode is enabled
+is_adventure_enabled() {
+    if [[ -f "$CLAUDE_FILE" ]]; then
+        grep -qF "$START_MARKER" "$CLAUDE_FILE"
+        return $?
+    fi
+    return 1
+}
+
+# Function to enable adventure mode
+enable_adventure() {
+    if is_adventure_enabled; then
+        echo "Adventure mode is already enabled."
+        return 0
+    fi
+    
+    # Check if ADVENTURE_MODE.md exists
+    if [[ ! -f "$ADVENTURE_MODE_FILE" ]]; then
+        echo "Error: $ADVENTURE_MODE_FILE not found."
+        echo "Please ensure the adventure mode instructions file exists."
+        return 1
+    fi
+    
+    # Read the adventure mode content
+    local adventure_content=$(<"$ADVENTURE_MODE_FILE")
+    
+    # Prepare the content with markers
+    local marked_content="
+$START_MARKER
+$adventure_content
+$END_MARKER
+"
+    
+    if [[ -f "$CLAUDE_FILE" ]]; then
+        # File exists, append the marked content
+        echo "$marked_content" >> "$CLAUDE_FILE"
+    else
+        # Create file with the marked content
+        echo "$marked_content" > "$CLAUDE_FILE"
+    fi
+    
+    echo "Adventure mode enabled! May your code quests be legendary."
+}
+
+# Function to disable adventure mode
+disable_adventure() {
+    if ! is_adventure_enabled; then
+        echo "Adventure mode is already disabled."
+        return 0
+    fi
+    
+    # Remove content between markers using awk
+    local temp_file=$(mktemp)
+    awk -v start="$START_MARKER" -v end="$END_MARKER" '
+        $0 == start { skip = 1; next }
+        $0 == end { skip = 0; next }
+        !skip { print }
+    ' "$CLAUDE_FILE" > "$temp_file"
+    
+    # Check if file would be empty after removal
+    if [[ ! -s "$temp_file" ]]; then
+        # File would be empty, so delete it
+        rm -f "$CLAUDE_FILE"
+        echo "Adventure mode disabled. The Terminal Kingdom awaits your return."
+    else
+        # File has other content, preserve it
+        mv "$temp_file" "$CLAUDE_FILE"
+        echo "Adventure mode disabled. The Terminal Kingdom awaits your return."
+    fi
+    
+    rm -f "$temp_file"
+}
+
+# Main logic
+case "$1" in
+    on|true|1)
+        enable_adventure
+        ;;
+    off|false|0)
+        disable_adventure
+        ;;
+    "")
+        # Toggle mode
+        if is_adventure_enabled; then
+            disable_adventure
+        else
+            enable_adventure
+        fi
+        ;;
+    *)
+        echo "Usage: $0 [on|off|true|false|1|0]"
+        echo "Without arguments: toggles current state"
+        exit 1
+        ;;
+esac
