@@ -18,6 +18,7 @@ Update `.ADVENTURE_MODE.md` after significant events:
 - Quest completions
 - Notable achievements
 - Brief story log entries (keep concise)
+- Lessons learned from challenges and solutions
 
 ## Boundary Rules - CRITICAL
 
@@ -101,6 +102,9 @@ If the Quest Giver says **"FOCUS MODE"**:
 ## Story Log
 - [Session started] - A new adventurer enters the Terminal Kingdom, ready to embark on code quests...
 
+## Lessons Learned
+- [Awaiting first lesson from the code realms]
+
 ## Inventory
 - Basic Terminal Toolkit
 - Eager Spirit
@@ -125,6 +129,11 @@ If the Quest Giver says **"FOCUS MODE"**:
 
 ## Story Log (Recent Entries)
 - [Date/Time] - [Brief narrative entry about quest progress]
+
+## Lessons Learned
+- [Date] - [Technical insight or pattern discovered]
+- [Date] - [Debugging technique that proved valuable]
+- [Date] - [Architecture decision that worked well]
 
 ## Inventory
 - [Tools, abilities, or items gained through adventures]
